@@ -79,3 +79,27 @@ struct AppIconButton: View {
         }
     }
 }
+
+// MARK: - Preview
+
+#Preview("App Icon Buttons") {
+   HStack(spacing: 20) {
+
+       AppIconButton(
+           icon: "plus",
+           accessibilityLabel: "Add Plant",
+           variant: .primary,
+           action: {}
+       )
+
+       AppIconButton(
+           icon: "xmark",
+           accessibilityLabel: "Close",
+           variant: .secondary,
+           action: {}
+       )
+   }
+   .padding(30)
+   .background(AppColors.background)
+   .preferredColorScheme(.dark)
+}
