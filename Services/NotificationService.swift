@@ -15,7 +15,9 @@ class NotificationService {
 
         cancel(for: plant)
 
-        let seconds = 10.0
+        
+        let seconds = Double(plant.wateringFrequency.intervalDays * 86400)
+
 
         center.requestAuthorization(options: [.alert, .sound]) { allowed, error in
 
@@ -30,7 +32,7 @@ class NotificationService {
 
             let trigger = UNTimeIntervalNotificationTrigger(
                 timeInterval: seconds,
-                repeats: false
+                repeats: true
             )
 
             let request = UNNotificationRequest(
