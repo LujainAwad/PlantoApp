@@ -1,195 +1,19 @@
 
-//
-// HomeView.swift - Main screen of the Planto app.
-//
-// Contains:
-// - My Plants header.
-// - Empty, No Reminders, Today, and All Done states.
-// - Daily progress and plant reminders.
-// - Add and edit plant sheets.
-// - Swipe to delete with confirmation.
-// - Floating Liquid Glass add button.
-// - Daily refresh when the app becomes active.
-//
-// Used by: PlantoApp.
-//
-// Learn: @State, @Environment, switch, List,
-// ForEach, sheet, confirmationDialog, scenePhase,
-// and Feature-Based MVVM.
-//
-
 import SwiftUI
-
-// MARK: - Home View
 
 struct HomeView: View {
 
-        @State private var plantViewModel = PlantViewModel()
-
-
-
-    // MARK: - UI State
-
-    @State private var activeSheet: PlantSheet?
-    @State private var plantToDelete: Plant?
-    @State private var showDeleteConfirmation = false
-
-    // MARK: - Environment
+    @State private var viewModel = PlantViewModel()
+    @State private var showSheet = false
+    @State private var editingPlant: Plant?
 
     @Environment(\.scenePhase) private var scenePhase
 
-
-    // MARK: - Sheet Destination
-
-    private enum PlantSheet: Identifiable {
-
-        case add
-        case edit(Plant)
-
-        var id: String {
-
-            switch self {
-
-            case .add:
-                return "add"
-
-            case .edit(let plant):
-                return plant.id.uuidString
-            }
-        }
-    }
-
-    // MARK: - Body
-
     var body: some View {
-
         VStack(spacing: 0) {
 
-            header
-
-            // MARK: - Screen State
-
-            Group {
-
-                switch plantViewModel.screenState {
-
-                case .empty:
-
-                    EmptyStateView {
-                        activeSheet = .add
-                    }
-
-                case .noReminders:
-
-                    noRemindersView
-
-                case .todayReminders:
-
-                    todayRemindersView
-
-                case .allDone:
-
-                    AllDoneView()
-                }
-            }
-            .frame(
-                maxWidth: .infinity,
-                maxHeight: .infinity
-            )
-        }
-        .background(
-            AppColors.background.ignoresSafeArea()
-        )
-
-        // MARK: - Floating Add Button
-
-        .overlay(alignment: .bottomTrailing) {
-
-            if plantViewModel.shouldShowAddButton {
-
-                addButton
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 20)
-            }
-        }
-
-        // MARK: - Add / Edit Sheet
-
-        .sheet(item: $activeSheet) { destination in
-
-            switch destination {
-
-            case .add:
-
-                SetReminderView(
-                    plantStore: plantViewModel
-                )
-                .presentationDetents([.large])
-
-            case .edit(let plant):
-
-                SetReminderView(
-                    plantStore: plantViewModel,
-                    editingPlant: plant
-                )
-                .presentationDetents([.large])
-            }
-        }
-
-        // MARK: - Delete Confirmation
-
-        .confirmationDialog(
-            "Delete Plant Reminder?",
-            isPresented: $showDeleteConfirmation,
-            titleVisibility: .visible
-        ) {
-
-            Button(
-                "Delete Reminder",
-                role: .destructive
-            ) {
-
-                guard let plant = plantToDelete else {
-                    return
-                }
-
-                withAnimation {
-                    plantViewModel.deletePlant(plant)
-                }
-
-                plantToDelete = nil
-            }
-
-            Button("Cancel", role: .cancel) {
-                plantToDelete = nil
-            }
-
-        } message: {
-
-            Text(
-                "This plant reminder will be permanently deleted."
-            )
-        }
-
-        // MARK: - Daily Refresh
-
-        .onChange(of: scenePhase) { _, newPhase in
-
-            if newPhase == .active {
-                plantViewModel.refreshDailyReminders()
-            }
-        }
-        .preferredColorScheme(.dark)
-    }
-
-    // MARK: - Header
-
-    private var header: some View {
-
-        VStack(spacing: 0) {
-
+            // Header
             HStack {
-
                 Text("My Plants 🌱")
                     .font(AppFonts.screenTitle)
                     .foregroundStyle(AppColors.primaryText)
@@ -203,138 +27,111 @@ struct HomeView: View {
             Rectangle()
                 .fill(AppColors.headerDivider)
                 .frame(height: 1)
+
+            // Screen Content
+            switch viewModel.screenState {
+
+            case .empty:
+                EmptyStateView {
+                    editingPlant = nil
+                    showSheet = true
+                }
+
+            case .noReminders:
+                VStack {
+                    Spacer()
+
+                    Text("No reminders set yet...")
+                        .font(AppFonts.emptyTitle)
+                        .foregroundStyle(AppColors.emptyReminderText)
+
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+
+            case .todayReminders:
+                todayRemindersView
+
+            case .allDone:
+                AllDoneView()
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(AppColors.background.ignoresSafeArea())
+
+        // Add Button
+        .overlay(alignment: .bottomTrailing) {
+            if viewModel.screenState != .empty {
+                AppIconButton(
+                    icon: "plus",
+                    accessibilityLabel: "Add plant"
+                ) {
+                    editingPlant = nil
+                    showSheet = true
+                }
+                .padding(20)
+            }
+        }
+
+        // Add or Edit
+        .sheet(isPresented: $showSheet) {
+            SetReminderView(
+                viewModel: viewModel,
+                editingPlant: editingPlant
+            )
+            .presentationDetents([.large])
+        }
+
+        // Refresh
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active {
+                viewModel.refreshDailyReminders()
+            }
         }
     }
 
-    // MARK: - No Reminders View
-
-    private var noRemindersView: some View {
-
-        VStack {
-
-            Spacer()
-
-            Text("No reminders set yet...")
-                .font(AppFonts.emptyTitle)
-                .foregroundStyle(
-                    AppColors.emptyReminderText
-                )
-
-            Spacer()
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    // MARK: - Today's Reminders
-
+    // Plant List
     private var todayRemindersView: some View {
-
         List {
 
-            // MARK: - Daily Progress
-
             PlantProgressView(
-                completedCount: plantViewModel.completedCount,
-                totalCount: plantViewModel.totalCount
+                completedCount: viewModel.completedCount,
+                totalCount: viewModel.totalCount
             )
-            .padding(.horizontal, 8)
-            .padding(.top, 36)
-            .padding(.bottom, 40)
-            .listRowInsets(
-                EdgeInsets(
-                    top: 0,
-                    leading: 16,
-                    bottom: 0,
-                    trailing: 16
-                )
-            )
+            .padding(.vertical, 30)
             .listRowBackground(AppColors.background)
             .listRowSeparator(.hidden)
 
-            // MARK: - Plant Rows
-
-            ForEach(plantViewModel.todayReminders) { plant in
-
+            ForEach(viewModel.todayReminders) { plant in
                 PlantRowView(
                     plant: plant,
-                    isCompleted: plantViewModel.isCompleted(plant),
-
+                    isCompleted: viewModel.isCompleted(plant),
                     onToggle: {
-
-                        withAnimation(
-                            .easeInOut(duration: 0.3)
-                        ) {
-                            plantViewModel.toggleReminder(
-                                for: plant
-                            )
-                        }
+                        viewModel.toggleReminder(for: plant)
                     },
-
                     onEdit: {
-                        activeSheet = .edit(plant)
+                        editingPlant = plant
+                        showSheet = true
                     }
                 )
-                .listRowInsets(
-                    EdgeInsets(
-                        top: 0,
-                        leading: 0,
-                        bottom: 0,
-                        trailing: 0
-                    )
-                )
+                .listRowInsets(EdgeInsets())
                 .listRowBackground(AppColors.background)
                 .listRowSeparator(.hidden)
-
-                // MARK: - Swipe to Delete
-
-                .swipeActions(
-                    edge: .trailing,
-                    allowsFullSwipe: false
-                ) {
-
+                .swipeActions {
                     Button(role: .destructive) {
-
-                        plantToDelete = plant
-                        showDeleteConfirmation = true
-
+                        viewModel.deletePlant(plant)
                     } label: {
-
-                        Label(
-                            "Delete",
-                            systemImage: "trash"
-                        )
+                        Label("Delete", systemImage: "trash")
                     }
-                    .tint(AppColors.destructive)
                 }
             }
         }
         .listStyle(.plain)
         .scrollContentBackground(.hidden)
-        .background(AppColors.background)
-        .contentMargins(
-            .bottom,
-            100,
-            for: .scrollContent
-        )
+        .safeAreaPadding(.bottom, 80)
     }
-
-
-    // MARK: - Floating Add Button
-
-    private var addButton: some View {
-        AppIconButton(
-            icon: "plus",
-            accessibilityLabel: "Add plant",
-            variant: .primary
-        ) {
-            activeSheet = .add
-        }
-    }
-
 }
 
-// MARK: - Preview
-
-#Preview("Home") {
+#Preview {
     HomeView()
 }

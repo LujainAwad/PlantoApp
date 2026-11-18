@@ -1,6 +1,5 @@
-import SwiftUI
 
-// MARK: - App Icon Button
+import SwiftUI
 
 struct AppIconButton: View {
 
@@ -17,89 +16,33 @@ struct AppIconButton: View {
 
     var body: some View {
         Group {
-            if #available(iOS 26.0, *) {
-                switch variant {
-                case .primary:
-                    Button(action: action) {
-                        buttonIcon
-                    }
-                    .buttonStyle(.glassProminent)
-                    .buttonBorderShape(.circle)
-                    .tint(AppColors.primaryGreen)
-
-                case .secondary:
-                    Button(action: action) {
-                        buttonIcon
-                    }
-                    .buttonStyle(.glass)
-                    .buttonBorderShape(.circle)
+            if variant == .primary {
+                Button(action: action) {
+                    Image(systemName: icon)
+                        .font(.system(size: 20))
+                        .frame(width: 44, height: 44)
                 }
+                .buttonStyle(.glassProminent)
+                .tint(AppColors.primaryGreen)
+
             } else {
                 Button(action: action) {
-                    buttonIcon
-                        .foregroundStyle(.white)
-                        .background(
-                            buttonColor,
-                            in: Circle()
-                        )
+                    Image(systemName: icon)
+                        .font(.system(size: 17))
+                        .frame(width: 44, height: 44)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.glass)
             }
         }
+        .buttonBorderShape(.circle)
         .disabled(isDisabled)
         .accessibilityLabel(accessibilityLabel)
     }
-
-    // MARK: - Icon
-
-    private var buttonIcon: some View {
-        Image(systemName: icon)
-            .font(.system(
-                size: iconSize,
-                weight: .medium
-            ))
-            .frame(width: 44, height: 44)
-    }
-
-    // MARK: - Styling
-
-    private var iconSize: CGFloat {
-        switch variant {
-        case .primary: return 20
-        case .secondary: return 17
-        }
-    }
-
-    private var buttonColor: Color {
-        switch variant {
-        case .primary:
-            return AppColors.primaryGreen
-        case .secondary:
-            return Color.white.opacity(0.12)
-        }
-    }
 }
 
-// MARK: - Preview
-
-#Preview("App Icon Buttons") {
-   HStack(spacing: 20) {
-
-       AppIconButton(
-           icon: "plus",
-           accessibilityLabel: "Add Plant",
-           variant: .primary,
-           action: {}
-       )
-
-       AppIconButton(
-           icon: "xmark",
-           accessibilityLabel: "Close",
-           variant: .secondary,
-           action: {}
-       )
-   }
-   .padding(30)
-   .background(AppColors.background)
-   .preferredColorScheme(.dark)
+#Preview {
+    AppIconButton(
+        icon: "plus",
+        accessibilityLabel: "Add"
+    ) { }
 }

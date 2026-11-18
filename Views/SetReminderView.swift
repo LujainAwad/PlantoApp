@@ -1,376 +1,241 @@
 
-//
-// SetReminderView.swift - Adds and edits plant reminders.
-//
-// Contains:
-// - Plant name input.
-// - Room, light, watering frequency, and water selection.
-// - Reusable form components.
-// - Liquid Glass save and close buttons.
-// - Delete confirmation when editing.
-// - Keyboard focus and sheet dismissal.
-//
-// Used by: HomeView.
-//
-// Learn: @State, @FocusState, @Environment,
-// TextField, Menu, ForEach, and MVVM data binding.
-//
-
 import SwiftUI
-
-// MARK: - Set Reminder View
 
 struct SetReminderView: View {
 
-    // MARK: - Environment
-
     @Environment(\.dismiss) private var dismiss
 
-    // MARK: - ViewModel
+    let viewModel: PlantViewModel
+    var editingPlant: Plant? = nil
 
-    let plantViewModel: PlantViewModel
-    let editingPlant: Plant?
+    // MARK: - Properties
 
-    // MARK: - Form State
-
-    @State private var plantName: String
-    @State private var selectedRoom: PlantRoom
-    @State private var selectedLight: PlantLight
-    @State private var selectedFrequency: WateringFrequency
-    @State private var selectedWater: WaterAmount
-
-    // MARK: - UI State
-
-    @State private var showDeleteConfirmation = false
-    @FocusState private var isNameFocused: Bool
-
-    // MARK: - Initializer
-
-    init(
-        plantStore: PlantViewModel,
-        editingPlant: Plant? = nil
-    ) {
-        self.plantViewModel = plantStore
-        self.editingPlant = editingPlant
-
-        _plantName = State(
-            initialValue: editingPlant?.name ?? ""
-        )
-        _selectedRoom = State(
-            initialValue: editingPlant?.room ?? .bedroom
-        )
-        _selectedLight = State(
-            initialValue: editingPlant?.light ?? .fullSun
-        )
-        _selectedFrequency = State(
-            initialValue: editingPlant?.wateringFrequency ?? .everyDay
-        )
-        _selectedWater = State(
-            initialValue: editingPlant?.waterAmount ?? .small
-        )
-    }
-
-    // MARK: - Form Validation
-
-    private var isValid: Bool {
-        !plantName.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        ).isEmpty
-    }
+    @State private var plantName = ""
+    @State private var selectedRoom: PlantRoom = .bedroom
+    @State private var selectedLight: PlantLight = .fullSun
+    @State private var selectedFrequency: WateringFrequency = .everyDay
+    @State private var selectedWater: WaterAmount = .small
 
     // MARK: - Body
 
     var body: some View {
+
         VStack(spacing: 0) {
-            header
+
+            // MARK: - Header
+
+            HStack {
+
+                AppIconButton(
+                    icon: "xmark",
+                    accessibilityLabel: "Close",
+                    variant: .secondary
+                ) {
+                    dismiss()
+                }
+
+                Spacer()
+
+                Text("Set Reminder")
+                    .font(AppFonts.formHeader)
+                    .foregroundStyle(AppColors.primaryText)
+
+                Spacer()
+
+                AppIconButton(
+                    icon: "checkmark",
+                    accessibilityLabel: "Save plant"
+                ) {
+                    savePlant()
+                }
+            }
+            .padding(.horizontal, 24)
+            .padding(.top, 18)
 
             ScrollView {
-                VStack(spacing: 0) {
-                    plantNameField
 
-                    roomAndLightCard
-                        .padding(.top, 40)
+                VStack(spacing: 40) {
 
-                    wateringCard
-                        .padding(.top, 40)
+                    // MARK: - Plant Name
 
-                    if editingPlant != nil {
-                        deleteButton
-                            .padding(.top, 64)
+                    HStack(spacing: 12) {
+
+                        Text("Plant Name")
+                            .foregroundStyle(AppColors.primaryText)
+
+                        TextField("Pothos", text: $plantName)
+                            .foregroundStyle(AppColors.primaryText)
+                            .tint(AppColors.cursorMint)
+                    }
+                    .padding(.horizontal, 20)
+                    .frame(height: 59)
+                    .background(
+                        AppColors.cardBackground,
+                        in: RoundedRectangle(cornerRadius: 30)
+                    )
+
+                    // MARK: - Room and Light
+
+                    VStack(spacing: 0) {
+
+                        // Room Picker
+
+                        Menu {
+                            Picker("Room", selection: $selectedRoom) {
+                                ForEach(PlantRoom.allCases, id: \.self) { room in
+                                    Text(room.rawValue).tag(room)
+                                }
+                            }
+                        } label: {
+                            PlantFormRow(
+                                icon: "location",
+                                title: "Room",
+                                value: selectedRoom.rawValue
+                            )
+                        }
+
+                        Rectangle()
+                            .fill(AppColors.fieldDivider)
+                            .frame(height: 1)
+                            .padding(.horizontal, 16)
+
+                        // Light Picker
+
+                        Menu {
+                            Picker("Light", selection: $selectedLight) {
+                                ForEach(PlantLight.allCases, id: \.self) { light in
+                                    Text(light.rawValue).tag(light)
+                                }
+                            }
+                        } label: {
+                            PlantFormRow(
+                                icon: "sun.max",
+                                title: "Light",
+                                value: selectedLight.rawValue
+                            )
+                        }
+                    }
+                    .background(
+                        AppColors.cardBackground,
+                        in: RoundedRectangle(cornerRadius: 30)
+                    )
+
+                    // MARK: - Watering Days and Water
+
+                    VStack(spacing: 0) {
+
+                        // Watering Days Picker
+
+                        Menu {
+                            Picker("Watering Days", selection: $selectedFrequency) {
+                                ForEach(WateringFrequency.allCases, id: \.self) { day in
+                                    Text(day.rawValue).tag(day)
+                                }
+                            }
+                        } label: {
+                            PlantFormRow(
+                                icon: "drop",
+                                title: "Watering Days",
+                                value: selectedFrequency.rawValue
+                            )
+                        }
+
+                        Rectangle()
+                            .fill(AppColors.fieldDivider)
+                            .frame(height: 1)
+                            .padding(.horizontal, 16)
+
+                        // Water Amount Picker
+
+                        Menu {
+                            Picker("Water", selection: $selectedWater) {
+                                ForEach(WaterAmount.allCases, id: \.self) { amount in
+                                    Text(amount.rawValue).tag(amount)
+                                }
+                            }
+                        } label: {
+                            PlantFormRow(
+                                icon: "drop",
+                                title: "Water",
+                                value: selectedWater.rawValue
+                            )
+                        }
+                    }
+                    .background(
+                        AppColors.cardBackground,
+                        in: RoundedRectangle(cornerRadius: 30)
+                    )
+
+                    // MARK: - Delete Reminder
+
+                    if let plant = editingPlant {
+                        Button {
+                            viewModel.deletePlant(plant)
+                            dismiss()
+                        } label: {
+                            Text("Delete Reminder")
+                                .font(AppFonts.destructiveButton)
+                                .foregroundStyle(AppColors.destructive)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(
+                                    AppColors.cardBackground,
+                                    in: RoundedRectangle(cornerRadius: 12)
+                                )
+                        }
+                        .padding(.top, 24)
                     }
                 }
                 .padding(.horizontal, 24)
                 .padding(.top, 40)
             }
-            .scrollDismissesKeyboard(.interactively)
         }
-        .frame(
-            maxWidth: .infinity,
-            maxHeight: .infinity
-        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppColors.sheetBackground)
-        .preferredColorScheme(.dark)
         .presentationCornerRadius(39)
 
-        // MARK: - Delete Confirmation
+        // MARK: - Load Plant For Editing
 
-        .confirmationDialog(
-            "Delete Plant Reminder?",
-            isPresented: $showDeleteConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button(
-                "Delete Reminder",
-                role: .destructive
-            ) {
-                deletePlant()
+        .onAppear {
+            if let plant = editingPlant {
+                plantName = plant.name
+                selectedRoom = plant.room
+                selectedLight = plant.light
+                selectedFrequency = plant.wateringFrequency
+                selectedWater = plant.waterAmount
             }
-
-            Button("Cancel", role: .cancel) {}
-
-        } message: {
-            Text(
-                "This plant reminder will be permanently deleted."
-            )
-        }
-    }
-
-    // MARK: - Header
-
-    private var header: some View {
-        HStack {
-            closeButton
-
-            Spacer()
-
-            Text("Set Reminder")
-                .font(AppFonts.formHeader)
-                .foregroundStyle(AppColors.primaryText)
-
-            Spacer()
-
-            saveButton
-        }
-        .padding(.horizontal, 24)
-        .padding(.top, 18)
-    }
-
-    // MARK: - Plant Name Field
-
-    private var plantNameField: some View {
-        HStack(spacing: 12) {
-            Text("Plant Name")
-                .font(.system(size: 17))
-                .foregroundStyle(AppColors.primaryText)
-                .fixedSize(
-                    horizontal: true,
-                    vertical: false
-                )
-
-            TextField(
-                "Pothos",
-                text: $plantName
-            )
-            .font(.system(size: 17))
-            .foregroundStyle(AppColors.primaryText)
-            .tint(AppColors.cursorMint)
-            .textInputAutocapitalization(.words)
-            .autocorrectionDisabled()
-            .textContentType(.none)
-            .keyboardType(.default)
-            .submitLabel(.done)
-            .focused($isNameFocused)
-            .frame(
-                maxWidth: .infinity,
-                alignment: .leading
-            )
-            .layoutPriority(1)
-            .onSubmit {
-                isNameFocused = false
-            }
-        }
-        .padding(.horizontal, 20)
-        .frame(height: 59)
-        .background(
-            AppColors.cardBackground,
-            in: RoundedRectangle(cornerRadius: 30)
-        )
-    }
-
-    // MARK: - Room & Light Card
-
-    private var roomAndLightCard: some View {
-        PlantFormCard {
-
-            // Room Picker
-            Menu {
-                ForEach(
-                    PlantRoom.allCases,
-                    id: \.self
-                ) { room in
-                    Button(room.rawValue) {
-                        selectedRoom = room
-                    }
-                }
-            } label: {
-                PlantFormRow(
-                    icon: "location",
-                    title: "Room",
-                    value: selectedRoom.rawValue
-                )
-            }
-            .buttonStyle(.plain)
-
-        } secondRow: {
-
-            // Light Picker
-            Menu {
-                ForEach(
-                    PlantLight.allCases,
-                    id: \.self
-                ) { light in
-                    Button(light.rawValue) {
-                        selectedLight = light
-                    }
-                }
-            } label: {
-                PlantFormRow(
-                    icon: "sun.max",
-                    title: "Light",
-                    value: selectedLight.rawValue
-                )
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    // MARK: - Watering Card
-
-    private var wateringCard: some View {
-        PlantFormCard {
-
-            // Watering Frequency Picker
-            Menu {
-                ForEach(
-                    WateringFrequency.allCases,
-                    id: \.self
-                ) { frequency in
-                    Button(frequency.rawValue) {
-                        selectedFrequency = frequency
-                    }
-                }
-            } label: {
-                PlantFormRow(
-                    icon: "drop",
-                    title: "Watering Days",
-                    value: selectedFrequency.rawValue
-                )
-            }
-            .buttonStyle(.plain)
-
-        } secondRow: {
-
-            // Water Amount Picker
-            Menu {
-                ForEach(
-                    WaterAmount.allCases,
-                    id: \.self
-                ) { amount in
-                    Button(amount.rawValue) {
-                        selectedWater = amount
-                    }
-                }
-            } label: {
-                PlantFormRow(
-                    icon: "drop",
-                    title: "Water",
-                    value: selectedWater.rawValue
-                )
-            }
-            .buttonStyle(.plain)
-        }
-    }
-    // MARK: - Close Button
-
-    private var closeButton: some View {
-        AppIconButton(
-            icon: "xmark",
-            accessibilityLabel: "Close",
-            variant: .secondary
-        ) {
-            isNameFocused = false
-            dismiss()
-        }
-    }
-
-    // MARK: - Save Button
-
-    private var saveButton: some View {
-        AppIconButton(
-            icon: "checkmark",
-            accessibilityLabel: "Save plant",
-            variant: .primary,
-            isDisabled: !isValid,
-            action: savePlant
-        )
-    }
-
-
-    // MARK: - Delete Button
-
-    private var deleteButton: some View {
-        Button(role: .destructive) {
-            showDeleteConfirmation = true
-
-        } label: {
-            Text("Delete Reminder")
-                .font(AppFonts.destructiveButton)
-                .foregroundStyle(AppColors.destructive)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(
-                    AppColors.cardBackground,
-                    in: Capsule()
-                )
         }
     }
 
     // MARK: - Save Plant
 
     private func savePlant() {
-        isNameFocused = false
 
-        let didSave = plantViewModel.savePlant(
-            name: plantName,
-            room: selectedRoom,
-            light: selectedLight,
-            frequency: selectedFrequency,
-            waterAmount: selectedWater,
-            editingPlant: editingPlant
+        let name = plantName.trimmingCharacters(
+            in: .whitespacesAndNewlines
         )
 
-        if didSave {
-            dismiss()
-        }
-    }
+        guard !name.isEmpty else { return }
 
-    // MARK: - Delete Plant
+        var plant = editingPlant ?? Plant(
+            name: name,
+            room: selectedRoom,
+            light: selectedLight,
+            wateringFrequency: selectedFrequency,
+            waterAmount: selectedWater
+        )
 
-    private func deletePlant() {
-        guard let editingPlant else {
-            return
-        }
+        plant.name = name
+        plant.room = selectedRoom
+        plant.light = selectedLight
+        plant.wateringFrequency = selectedFrequency
+        plant.waterAmount = selectedWater
 
-        isNameFocused = false
-        plantViewModel.deletePlant(editingPlant)
+        viewModel.savePlant(plant)
         dismiss()
     }
 }
 
-// MARK: - Preview
-
-#Preview("Add Plant") {
-    SetReminderView(
-        plantStore: PlantViewModel()
-    )
+#Preview {
+    SetReminderView(viewModel: PlantViewModel())
 }

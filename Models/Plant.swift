@@ -1,9 +1,8 @@
 
 import Foundation
 
-// MARK: - Plant Room
-
-enum PlantRoom: String, CaseIterable, Codable {
+// Available options in the form.
+enum PlantRoom: String, CaseIterable {
     case bedroom = "Bedroom"
     case livingRoom = "Living Room"
     case kitchen = "Kitchen"
@@ -11,17 +10,13 @@ enum PlantRoom: String, CaseIterable, Codable {
     case bathroom = "Bathroom"
 }
 
-// MARK: - Plant Light
-
-enum PlantLight: String, CaseIterable, Codable {
+enum PlantLight: String, CaseIterable {
     case fullSun = "Full Sun"
     case partialSun = "Partial Sun"
     case lowLight = "Low Light"
 }
 
-// MARK: - Watering Frequency
-
-enum WateringFrequency: String, CaseIterable, Codable {
+enum WateringFrequency: String, CaseIterable {
     case everyDay = "Every day"
     case everyTwoDays = "Every 2 days"
     case everyThreeDays = "Every 3 days"
@@ -41,41 +36,20 @@ enum WateringFrequency: String, CaseIterable, Codable {
     }
 }
 
-// MARK: - Water Amount
-
-enum WaterAmount: String, CaseIterable, Codable {
+enum WaterAmount: String, CaseIterable {
     case small = "20-50 ml"
     case medium = "50-100 ml"
     case large = "100-200 ml"
     case extraLarge = "200-300 ml"
 }
 
-// MARK: - Plant Model
-
-struct Plant: Identifiable, Codable {
-    let id: UUID
+// One plant and its watering choices.
+struct Plant: Identifiable {
+    let id = UUID()
     var name: String
     var room: PlantRoom
     var light: PlantLight
     var wateringFrequency: WateringFrequency
     var waterAmount: WaterAmount
-    var createdAt: Date
-
-    init(
-        id: UUID = UUID(),
-        name: String,
-        room: PlantRoom,
-        light: PlantLight,
-        wateringFrequency: WateringFrequency,
-        waterAmount: WaterAmount,
-        createdAt: Date = Date()
-    ) {
-        self.id = id
-        self.name = name
-        self.room = room
-        self.light = light
-        self.wateringFrequency = wateringFrequency
-        self.waterAmount = waterAmount
-        self.createdAt = createdAt
-    }
+    let createdAt = Date()
 }

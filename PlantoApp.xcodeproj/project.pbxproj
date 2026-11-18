@@ -6,8 +6,13 @@
 	objectVersion = 90;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		84C6128930AC748800C90256 /* Planto.icon in Resources */ = {isa = PBXBuildFile; fileRef = 84C6128830AC748800C90256 /* Planto.icon */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* Planto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Planto.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		84C6128830AC748800C90256 /* Planto.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Planto.icon; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -73,6 +78,7 @@
 				84C554E430A1ECEE0099BB3F /* Models */,
 				84C554DB30A1EAC10099BB3F /* Resources */,
 				000000000000000000000010 /* Planto */,
+				84C6128830AC748800C90256 /* Planto.icon */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -151,6 +157,7 @@
 		000000000000000140000000 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
+				84C6128930AC748800C90256 /* Planto.icon in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -301,6 +308,8 @@
 		000000000000000111000000 /* Debug configuration for PBXNativeTarget "Planto" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Planto;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = ZH6GHZH4NZ;
@@ -339,6 +348,8 @@
 		000000000000000112000000 /* Release configuration for PBXNativeTarget "Planto" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = Planto;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = ZH6GHZH4NZ;
