@@ -13,6 +13,13 @@
 /* Begin PBXFileReference section */
 		000000000000000000000120 /* Planto.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Planto.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		84C6128830AC748800C90256 /* Planto.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Planto.icon; sourceTree = "<group>"; };
+		84C6144030AD38E400C90256 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		84C6144230AD3A7A00C90256 /* all-done.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "all-done.png"; sourceTree = "<group>"; };
+		84C6144330AD3A7A00C90256 /* edit-reminder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "edit-reminder.png"; sourceTree = "<group>"; };
+		84C6144430AD3A7A00C90256 /* home.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = home.png; sourceTree = "<group>"; };
+		84C6144530AD3A7A00C90256 /* notification.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = notification.png; sourceTree = "<group>"; };
+		84C6144630AD3A7A00C90256 /* reminders.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = reminders.png; sourceTree = "<group>"; };
+		84C6144730AD3A7A00C90256 /* set-reminder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "set-reminder.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -79,6 +86,8 @@
 				84C554DB30A1EAC10099BB3F /* Resources */,
 				000000000000000000000010 /* Planto */,
 				84C6128830AC748800C90256 /* Planto.icon */,
+				84C6144030AD38E400C90256 /* README.md */,
+				84C6144830AD3A7A00C90256 /* Screenshots */,
 				000000000000000000000020 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -89,6 +98,19 @@
 				000000000000000000000120 /* Planto.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		84C6144830AD3A7A00C90256 /* Screenshots */ = {
+			isa = PBXGroup;
+			children = (
+				84C6144230AD3A7A00C90256 /* all-done.png */,
+				84C6144330AD3A7A00C90256 /* edit-reminder.png */,
+				84C6144430AD3A7A00C90256 /* home.png */,
+				84C6144530AD3A7A00C90256 /* notification.png */,
+				84C6144630AD3A7A00C90256 /* reminders.png */,
+				84C6144730AD3A7A00C90256 /* set-reminder.png */,
+			);
+			path = Screenshots;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
